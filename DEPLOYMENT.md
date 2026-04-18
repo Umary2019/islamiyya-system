@@ -138,6 +138,37 @@ This guide covers deploying the Islamiyya School Management System to production
 3. **Configure Environment**
    - Set API endpoint in `src/utils/api.js` to production backend URL
 
+## Full-Stack Deployment on Vercel (Frontend + Backend)
+
+Use this approach for this repository structure.
+
+1. **Deploy backend as its own Vercel project**
+   - Import the same GitHub repository in Vercel.
+   - Set **Root Directory** to `backend`.
+   - Vercel will use `backend/vercel.json` and serve Express via serverless function.
+   - Add backend environment variables in Vercel:
+     - `MONGODB_URI`
+     - `JWT_SECRET`
+     - `NODE_ENV=production`
+
+2. **Get backend production URL**
+   - Example: `https://islamiyya-backend.vercel.app`
+   - Health check URL: `https://islamiyya-backend.vercel.app/api/health`
+
+3. **Deploy frontend as a second Vercel project**
+   - Import the same GitHub repository again.
+   - Set **Root Directory** to `frontend`.
+   - Vercel will build with Vite and use `frontend/vercel.json` for SPA rewrites.
+
+4. **Set frontend environment variable**
+   - In frontend Vercel project settings, add:
+     - `VITE_API_URL=https://islamiyya-backend.vercel.app/api`
+
+5. **Redeploy frontend**
+   - Trigger a redeploy after adding env vars.
+
+This setup is required because the codebase is split into two standalone apps.
+
 ### Option 2: Netlify
 
 1. **Build the project**

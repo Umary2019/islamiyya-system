@@ -2,11 +2,24 @@ const mongoose = require('mongoose');
 
 const connectDB = async () => {
   try {
-    if (!process.env.MONGODB_URI) {
-      throw new Error('MONGODB_URI is not set');
+    const mongoUri = process.env.MONGODB_URI || process.env.MONGO_URI;
+
+    if (!mongoUri) {
+      throw new Error('MONGODB_URI (or MONGO_URI) is not set');
     }
 
-    const conn = await mongoose.connect(process.env.MONGODB_URI);
+    if (mongoose.connection.readyState === 1) {
+      return mongoose.connection;
+    }
+
+    if (mongoose.connection.readyState === 2) {
+      return new Promise((resolve, reject) => {
+        mongoose.connection.once('connected', () => resolve(mongoose.connection));
+        mongoose.connection.once('error', reject);
+      });
+    }
+
+    const conn = await mongoose.connect(mongoUri);
     console.log(`MongoDB Connected: ${conn.connection.host}`);
     return conn;
   } catch (error) {

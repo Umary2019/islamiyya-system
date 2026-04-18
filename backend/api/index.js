@@ -3,13 +3,28 @@ const connectDB = require('../config/database');
 const ensureAdmin = require('../config/ensureAdmin');
 
 let initialized = false;
+let initPromise = null;
 
 async function initialize() {
   if (initialized) return;
+  if (initPromise) {
+    await initPromise;
+    return;
+  }
 
-  await connectDB();
-  await ensureAdmin();
-  initialized = true;
+  initPromise = (async () => {
+    await connectDB();
+    await ensureAdmin();
+    initialized = true;
+  })();
+
+  try {
+    await initPromise;
+  } finally {
+    if (!initialized) {
+      initPromise = null;
+    }
+  }
 }
 
 module.exports = async (req, res) => {

@@ -169,19 +169,6 @@ Use this approach for this repository structure.
 
 This setup is required because the codebase is split into two standalone apps.
 
-### Option 2: Netlify
-
-1. **Build the project**
-   ```bash
-   cd frontend
-   npm run build
-   ```
-
-2. **Drag and drop `dist` folder to Netlify**
-   OR connect GitHub for automatic deployments
-
-3. **Set environment variables in Netlify dashboard**
-
 ### Option 3: AWS S3 + CloudFront
 
 1. **Build the project**

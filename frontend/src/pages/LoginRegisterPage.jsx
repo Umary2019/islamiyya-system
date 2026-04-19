@@ -1,11 +1,25 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
 
-const LoginRegisterPage = ({ role, roleDisplay }) => {
+const LoginRegisterPage = ({ role, roleDisplay, defaultMode = 'login' }) => {
   const isAdmin = role === 'admin';
-  const [isLogin, setIsLogin] = useState(true);
+  const location = useLocation();
+  const resolveLoginMode = () => {
+    if (isAdmin) return true;
+
+    if (defaultMode === 'register') return false;
+    if (defaultMode === 'login') return true;
+
+    if (location.state?.mode === 'register') return false;
+    if (location.state?.mode === 'login') return true;
+    if (typeof location.state?.isLogin === 'boolean') return location.state.isLogin;
+
+    return true;
+  };
+
+  const [isLogin, setIsLogin] = useState(resolveLoginMode);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -19,6 +33,11 @@ const LoginRegisterPage = ({ role, roleDisplay }) => {
 
   const { login, register } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    setIsLogin(resolveLoginMode());
+    setError('');
+  }, [location.state, isAdmin]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -96,10 +115,10 @@ const LoginRegisterPage = ({ role, roleDisplay }) => {
 
   const getRoleColor = () => {
     const colors = {
-      admin: 'from-blue-600 to-blue-700',
-      staff: 'from-green-600 to-green-700',
-      parent: 'from-purple-600 to-purple-700',
-      student: 'from-yellow-600 to-yellow-700',
+      admin: 'from-[#163749] to-[#1f4f63]',
+      staff: 'from-[#14503f] to-[#1f7a63]',
+      parent: 'from-[#3d4f2a] to-[#657f3b]',
+      student: 'from-[#7e5f1f] to-[#b2872e]',
     };
     return colors[role] || 'from-gray-600 to-gray-700';
   };
@@ -117,20 +136,19 @@ const LoginRegisterPage = ({ role, roleDisplay }) => {
   return (
     <>
       <Navbar />
-      <div className="min-h-screen bg-gray-50 py-12 px-4">
+      <div className="min-h-screen mesh-bg py-10 px-4 fade-rise">
         <div className="max-w-4xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Left Side - Info */}
-            <div className={`bg-gradient-to-br ${getRoleColor()} text-white rounded-lg p-8 flex flex-col justify-center hidden md:flex`}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className={`bg-gradient-to-br ${getRoleColor()} text-white rounded-3xl p-8 sm:p-10 flex flex-col justify-center`}>
               <div className="text-6xl mb-6">{getRoleIcon()}</div>
-              <h2 className="text-4xl font-bold mb-4">{roleDisplay}</h2>
-              <p className="text-lg text-opacity-90 mb-6">
+              <h2 className="text-4xl font-bold mb-4">{roleDisplay} Portal</h2>
+              <p className="text-lg text-white/85 mb-6">
                 {role === 'admin' && 'Manage the system, approve records, and view analytics'}
                 {role === 'staff' && 'Record student progress and create weekly summaries'}
                 {role === 'parent' && 'Monitor your child\'s memorization progress'}
                 {role === 'student' && 'Track your memorization journey and view your records'}
               </p>
-              <div className="space-y-3 text-sm text-opacity-80">
+              <div className="space-y-3 text-sm text-white/80">
                 <p className="flex items-center">
                   <span className="mr-3">✓</span>
                   Secure access with encrypted data
@@ -146,13 +164,12 @@ const LoginRegisterPage = ({ role, roleDisplay }) => {
               </div>
             </div>
 
-            {/* Right Side - Form */}
-            <div className="bg-white rounded-lg shadow-lg p-8">
+            <div className="glass-panel rounded-3xl p-8 sm:p-10">
               <div className="text-center mb-8">
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                <h1 className="text-3xl font-bold text-[color:var(--ink-900)] mb-2">
                   {isLogin ? 'Welcome Back' : 'Create Account'}
                 </h1>
-                <p className="text-gray-600">
+                <p className="text-[color:var(--ink-500)]">
                   {isAdmin
                     ? 'Sign in with administrator credentials'
                     : isLogin
@@ -162,7 +179,7 @@ const LoginRegisterPage = ({ role, roleDisplay }) => {
               </div>
 
               {error && (
-                <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 font-semibold text-sm">
+                <div className="mb-6 p-4 bg-[#fce8e5] border border-[#e7b8b1] rounded-xl text-[#8d3428] font-semibold text-sm">
                   ⚠️ {error}
                 </div>
               )}
@@ -171,7 +188,7 @@ const LoginRegisterPage = ({ role, roleDisplay }) => {
                 {!isLogin && !isAdmin && (
                   <>
                     <div>
-                      <label className="block text-sm font-bold text-gray-700 mb-2">
+                      <label className="block text-sm font-bold text-[color:var(--ink-700)] mb-2">
                         Full Name <span className="text-red-500">*</span>
                       </label>
                       <input
@@ -179,13 +196,13 @@ const LoginRegisterPage = ({ role, roleDisplay }) => {
                         name="name"
                         value={formData.name}
                         onChange={handleChange}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-4 py-3 border border-[#d8cfbd] rounded-xl bg-white/80 focus:outline-none focus:ring-2 focus:ring-[#1f7a63]"
                         placeholder="Enter your full name"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-bold text-gray-700 mb-2">
+                      <label className="block text-sm font-bold text-[color:var(--ink-700)] mb-2">
                         Phone Number <span className="text-red-500">*</span>
                       </label>
                       <input
@@ -193,7 +210,7 @@ const LoginRegisterPage = ({ role, roleDisplay }) => {
                         name="phone"
                         value={formData.phone}
                         onChange={handleChange}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-4 py-3 border border-[#d8cfbd] rounded-xl bg-white/80 focus:outline-none focus:ring-2 focus:ring-[#1f7a63]"
                         placeholder="Enter your phone number"
                       />
                     </div>
@@ -201,7 +218,7 @@ const LoginRegisterPage = ({ role, roleDisplay }) => {
                 )}
 
                 <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-2">
+                  <label className="block text-sm font-bold text-[color:var(--ink-700)] mb-2">
                     Email <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -209,13 +226,13 @@ const LoginRegisterPage = ({ role, roleDisplay }) => {
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-[#d8cfbd] rounded-xl bg-white/80 focus:outline-none focus:ring-2 focus:ring-[#1f7a63]"
                     placeholder="Enter your email"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-2">
+                  <label className="block text-sm font-bold text-[color:var(--ink-700)] mb-2">
                     Password <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -223,17 +240,17 @@ const LoginRegisterPage = ({ role, roleDisplay }) => {
                     name="password"
                     value={formData.password}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-[#d8cfbd] rounded-xl bg-white/80 focus:outline-none focus:ring-2 focus:ring-[#1f7a63]"
                     placeholder="Enter a strong password"
                   />
                   {!isLogin && (
-                    <p className="text-xs text-gray-500 mt-1">Must be at least 6 characters</p>
+                    <p className="text-xs text-[color:var(--ink-500)] mt-1">Must be at least 6 characters</p>
                   )}
                 </div>
 
                 {!isLogin && !isAdmin && (
                   <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-2">
+                    <label className="block text-sm font-bold text-[color:var(--ink-700)] mb-2">
                       Confirm Password <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -241,7 +258,7 @@ const LoginRegisterPage = ({ role, roleDisplay }) => {
                       name="confirmPassword"
                       value={formData.confirmPassword}
                       onChange={handleChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-3 border border-[#d8cfbd] rounded-xl bg-white/80 focus:outline-none focus:ring-2 focus:ring-[#1f7a63]"
                       placeholder="Confirm your password"
                     />
                   </div>
@@ -250,7 +267,7 @@ const LoginRegisterPage = ({ role, roleDisplay }) => {
                 <button
                   type="submit"
                   disabled={loading}
-                  className={`w-full py-3 rounded-lg font-bold text-white transition mt-6 ${getRoleColor().replace('from-', 'bg-').replace(' to-', ' ')} hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed`}
+                  className={`w-full py-3 rounded-xl font-bold text-white transition mt-6 bg-gradient-to-r ${getRoleColor()} hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed`}
                 >
                   {loading ? (
                     <span className="flex items-center justify-center">
@@ -266,26 +283,26 @@ const LoginRegisterPage = ({ role, roleDisplay }) => {
               </form>
 
               {!isAdmin && (
-                <div className="mt-8 pt-6 border-t border-gray-200">
-                <div className="text-center">
-                  <p className="text-gray-600 text-sm mb-3">
-                    {isLogin ? "Don't have an account?" : 'Already have an account?'}
-                  </p>
-                  <button
-                    onClick={() => {
-                      setIsLogin(!isLogin);
-                      setError('');
-                    }}
-                    className="text-blue-600 hover:text-blue-700 font-bold text-sm"
-                  >
-                    {isLogin ? 'Create one now' : 'Sign in instead'}
-                  </button>
-                </div>
+                <div className="mt-8 pt-6 border-t border-[#d9cfbd]">
+                  <div className="text-center">
+                    <p className="text-[color:var(--ink-500)] text-sm mb-3">
+                      {isLogin ? "Don't have an account?" : 'Already have an account?'}
+                    </p>
+                    <button
+                      onClick={() => {
+                        setIsLogin(!isLogin);
+                        setError('');
+                      }}
+                      className="text-[color:var(--mint-600)] hover:text-[color:var(--mint-500)] font-bold text-sm"
+                    >
+                      {isLogin ? 'Create one now' : 'Sign in instead'}
+                    </button>
+                  </div>
                 </div>
               )}
 
               <div className="mt-6 text-center">
-                <Link to="/" className="text-gray-600 hover:text-gray-900 font-medium text-sm flex items-center justify-center">
+                <Link to="/" className="text-[color:var(--ink-500)] hover:text-[color:var(--ink-900)] font-medium text-sm flex items-center justify-center">
                   <span className="mr-2">←</span>
                   Back to Home
                 </Link>

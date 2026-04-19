@@ -69,19 +69,35 @@ function App() {
           {/* Login/Register Pages */}
           <Route
             path="/admin-login-register"
-            element={<LoginRegisterPage role="admin" roleDisplay="Admin" />}
+            element={<LoginRegisterPage role="admin" roleDisplay="Admin" defaultMode="login" />}
+          />
+          <Route
+            path="/admin-register"
+            element={<LoginRegisterPage role="admin" roleDisplay="Admin" defaultMode="register" />}
           />
           <Route
             path="/staff-login-register"
-            element={<LoginRegisterPage role="staff" roleDisplay="Staff/Teacher" />}
+            element={<LoginRegisterPage role="staff" roleDisplay="Staff/Teacher" defaultMode="login" />}
+          />
+          <Route
+            path="/staff-register"
+            element={<LoginRegisterPage role="staff" roleDisplay="Staff/Teacher" defaultMode="register" />}
           />
           <Route
             path="/student-login-register"
-            element={<LoginRegisterPage role="student" roleDisplay="Student" />}
+            element={<LoginRegisterPage role="student" roleDisplay="Student" defaultMode="login" />}
+          />
+          <Route
+            path="/student-register"
+            element={<LoginRegisterPage role="student" roleDisplay="Student" defaultMode="register" />}
           />
           <Route
             path="/parent-login-register"
-            element={<LoginRegisterPage role="parent" roleDisplay="Parent/Guardian" />}
+            element={<LoginRegisterPage role="parent" roleDisplay="Parent/Guardian" defaultMode="login" />}
+          />
+          <Route
+            path="/parent-register"
+            element={<LoginRegisterPage role="parent" roleDisplay="Parent/Guardian" defaultMode="register" />}
           />
 
           {/* Protected Dashboards */}
